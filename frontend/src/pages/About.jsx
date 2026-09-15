@@ -1,6 +1,8 @@
 import React from 'react';
 
+// Static "About" page featuring the developer's profile and social links
 const About = () => {
+  // Card container style for the whole page content
   const containerStyle = {
     maxWidth: '900px',
     margin: '0 auto',
@@ -12,6 +14,8 @@ const About = () => {
     textAlign: 'center'
   };
 
+  // Base style shared by all social/link buttons (individual links override
+  // background/border/color to give each platform its own accent color)
   const socialBtnStyle = {
     display: 'inline-block',
     margin: '10px',
@@ -26,6 +30,7 @@ const About = () => {
 
   return (
     <div style={containerStyle}>
+      {/* Profile photo */}
       <img
         src="/dp.jpg"
         alt="@theshivanshvasu"
@@ -38,6 +43,9 @@ const About = () => {
         <strong>Join the community and grow together!</strong> Welcome to my platform where we build, deploy, and scale highly engineered systems.
       </p>
 
+      {/* Social/external links row, each opening in a new tab.
+          rel="noreferrer" prevents the new page from accessing window.opener (security best practice
+          when using target="_blank"), and also implies noopener behavior in modern browsers. */}
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px', marginTop: '20px' }}>
         <a href="https://theshivanshvasu.com" target="_blank" rel="noreferrer" style={socialBtnStyle}>🌐 Website</a>
         <a href="https://youtube.com/@shivanshvasu" target="_blank" rel="noreferrer" style={{ ...socialBtnStyle, background: 'rgba(239, 68, 68, 0.2)', borderColor: '#ef4444', color: '#ef4444' }}>📺 YouTube</a>
