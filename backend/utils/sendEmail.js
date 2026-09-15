@@ -1,7 +1,10 @@
 const nodemailer = require('nodemailer');
 
+// Generic email-sending utility used across the ShopNest app
+// (welcome emails, order confirmations, etc.)
 const sendEmail = async ({ email, subject, message }) => {
   try {
+    // Configure the transport using Gmail as the SMTP service
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -20,6 +23,7 @@ const sendEmail = async ({ email, subject, message }) => {
     await transporter.sendMail(mailOptions);
     console.log(`Email successfully sent to ${email}`);
   } catch (error) {
+    // Errors are logged but not thrown, so email failures don't break the calling flow
     console.error(`Failed to send email to ${email}: ${error.message}`);
   }
 };
