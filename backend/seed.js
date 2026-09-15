@@ -5,18 +5,26 @@ const User = require('./models/User');
 const Product = require('./models/Product');
 const connectDB = require('./config/db');
 
+// Load environment variables (MONGO_URI, etc.) from .env
 dotenv.config();
 
+// Establish DB connection before running any seed operations
 connectDB();
 
+// Wipes existing Users/Products and repopulates the database with
+// a default admin account and a set of sample products
 const importData = async () => {
   try {
+    // Clear out existing data first, so this script can be run repeatedly
+    // without creating duplicates
     await User.deleteMany();
     await Product.deleteMany();
 
+    // Hash the default admin password before storing it
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash('password123', salt);
     
+    // Create a default admin user for accessing admin-only routes/dashboards
     const adminUser = await User.create({
       name: 'Admin User',
       email: 'admin@shopnest.com',
@@ -24,6 +32,7 @@ const importData = async () => {
       role: 'admin'
     });
 
+    // Sample product catalog used to populate the store with demo data
     const products = [
       {
         name: 'Wireless Noise-Cancelling Headphones',
@@ -67,9 +76,11 @@ const importData = async () => {
       }
     ];
 
+    // Bulk-insert all sample products at once
     await Product.insertMany(products);
     
     console.log('✅ Data Imported Successfully!');
+    // Exit cleanly once seeding is done — this is a one-off script, not a long-running server
     process.exit();
   } catch (error) {
     console.error(`❌ Error with data import: ${error.message}`);
