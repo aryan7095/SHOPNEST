@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/product.css';
 
+// Reusable card component displaying a single product's image, name, price, and a link to its detail page
 const ProductCard = ({ product }) => {
   return (
     <div className="product-card">
