@@ -2,19 +2,23 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 
+// Admin page listing all products with edit/delete actions
 const AdminProducts = () => {
   const { user } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
 
+  // Fetch the product list on mount (public endpoint, no auth header needed here)
   useEffect(() => {
     const fetchProducts = async () => {
       const res = await fetch('/api/products');
       const data = await res.json();
+      // Defensive check: ensure we always set an array, even if the API returns something unexpected
       setProducts(Array.isArray(data) ? data : []);
     };
     fetchProducts();
   }, []);
 
+  // Deletes a product after confirmation, then removes it from local state
   const handleDelete = async (id) => {
     if (window.confirm('Are you strictly sure you want to delete this?')) {
       const res = await fetch(`/api/products/${id}`, {
@@ -22,6 +26,7 @@ const AdminProducts = () => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       if (res.ok) {
+        // Remove the deleted product from local state without refetching the whole list
         setProducts(products.filter(p => p._id !== id));
       }
     }
@@ -29,11 +34,13 @@ const AdminProducts = () => {
 
   return (
     <div style={containerStyle}>
+      {/* Header row: title + link to the add-product page */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h2 style={{ color: '#f97316' }}>Manage Products</h2>
         <Link to="/admin/add-product" className="btn">+ Add Product</Link>
       </div>
 
+      {/* Horizontally scrollable wrapper in case the table is wider than the viewport */}
       <div style={{ overflowX: 'auto' }}>
         <table style={tableStyle}>
           <thead>
@@ -49,12 +56,14 @@ const AdminProducts = () => {
           <tbody>
             {products.map(product => (
               <tr key={product._id} style={rowStyle}>
+                {/* Show a shortened product ID for readability */}
                 <td style={tdStyle}>{product._id.substring(0, 8)}...</td>
                 <td style={tdStyle}>{product.name}</td>
                 <td style={tdStyle}>₹{product.price.toFixed(2)}</td>
                 <td style={tdStyle}>{product.category}</td>
                 <td style={tdStyle}>{product.stock}</td>
                 <td style={tdStyle}>
+                  {/* Link to a dedicated edit page (component not shown here) */}
                   <Link to={`/admin/edit-product/${product._id}`} style={editBtn}>Edit</Link>
                   <button onClick={() => handleDelete(product._id)} style={deleteBtn}>Delete</button>
                 </td>
@@ -67,6 +76,7 @@ const AdminProducts = () => {
   );
 };
 
+// Shared inline styles for the page container, table, and action buttons
 const containerStyle = { maxWidth: '1200px', margin: '40px auto', padding: '30px', background: '#18181b', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', color: '#fafafa' };
 const tableStyle = { width: '100%', borderCollapse: 'collapse' };
 const rowStyle = { borderBottom: '1px solid rgba(255,255,255,0.1)' };
