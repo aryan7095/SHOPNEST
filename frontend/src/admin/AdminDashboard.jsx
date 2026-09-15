@@ -2,11 +2,14 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+// Admin dashboard: shows aggregate stats and quick links to admin management pages
 const AdminDashboard = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+  // Holds fetched analytics data (null while loading)
   const [stats, setStats] = useState(null);
 
+  // Guard route: redirect non-admins away, then fetch dashboard stats
   useEffect(() => {
     if (!user || user.role !== 'admin') {
       navigate('/');
@@ -22,9 +25,11 @@ const AdminDashboard = () => {
         if (res.ok) {
           setStats(data);
         } else {
+          // If the token is invalid/expired, send the user to login
           if (res.status === 401) {
             navigate('/login');
           }
+          // Fallback to zeroed-out stats so the UI can still render something
           setStats({ totalOrders: 0, totalProducts: 0, totalUsers: 0, totalRevenue: 0 });
         }
       } catch (error) {
@@ -34,6 +39,7 @@ const AdminDashboard = () => {
     fetchStats();
   }, [user, navigate]);
 
+  // Shared inline style for each stat card
   const cardStyle = {
     padding: '25px',
     background: '#18181b',
@@ -47,6 +53,7 @@ const AdminDashboard = () => {
     gap: '10px'
   };
 
+  // Shared inline style for the large stat number inside each card
   const numberStyle = {
     fontSize: '2.5rem',
     fontWeight: '700',
@@ -55,12 +62,14 @@ const AdminDashboard = () => {
 
   return (
     <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
+      {/* Header: logo, title, and welcome message */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '5px' }}>
         <img src="/ShopNestLogo.png" alt="Logo" style={{ height: '40px', width: '40px', borderRadius: '8px', objectFit: 'cover', filter: 'drop-shadow(0 0px 10px rgba(249, 115, 22, 0.3))' }} />
         <h2 style={{ margin: 0 }}>Admin Dashboard</h2>
       </div>
       <p style={{ color: '#a1a1aa', marginBottom: '30px', fontSize: '1.1rem' }}>Welcome back, <span style={{color: '#fff'}}>{user?.name}</span></p>
       
+      {/* Stats grid, shown once data has loaded; otherwise a loading message */}
       {stats ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
           <div style={cardStyle}>
@@ -84,6 +93,7 @@ const AdminDashboard = () => {
         <div style={{ textAlign: 'center', margin: '50px 0', color: '#f97316' }}>Loading metrics...</div>
       )}
 
+      {/* Quick-action buttons linking to other admin management pages */}
       <div style={{ marginTop: '40px', padding: '30px', background: '#18181b', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
         <h3 style={{ marginBottom: '25px', color: '#f97316' }}>Administrative Controls</h3>
         <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
