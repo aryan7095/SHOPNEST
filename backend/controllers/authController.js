@@ -3,17 +3,21 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const sendEmail = require('../utils/sendEmail');
 
+// Signs a JWT containing just the user's id, valid for 30 days
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
+// POST /register - creates a new user, sends a welcome/OTP email, and logs them in immediately
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     
+    // Prevent duplicate accounts for the same email
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: 'User already exists' });
 
+    // Hash the password before storing it
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -21,6 +25,8 @@ const registerUser = async (req, res) => {
     if (user) {
       
       // Generate a mock OTP
+      // Note: this OTP is generated here but not persisted or verified anywhere —
+      // it's included in the welcome email only, not used to gate account access
       const otp = Math.floor(100000 + Math.random() * 900000);
       
       // Send Welcome / OTP Email
@@ -36,6 +42,8 @@ const registerUser = async (req, res) => {
         message
       });
 
+      // Registration is immediately successful — user is logged in right away
+      // (no separate verification step required, unlike the Eventora OTP flow)
       res.status(201).json({
         _id: user._id,
         name: user.name,
@@ -51,11 +59,13 @@ const registerUser = async (req, res) => {
   }
 };
 
+// POST /login - authenticates a user with email/password
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
 
+    // Check user exists and password matches the stored hash
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
         _id: user._id,
@@ -72,6 +82,7 @@ const loginUser = async (req, res) => {
   }
 };
 
+// GET /users - returns all users (likely admin-only route), excluding password field
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({}).select('-password');
