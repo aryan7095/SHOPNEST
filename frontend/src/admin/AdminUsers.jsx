@@ -1,16 +1,19 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
+// Admin page displaying a read-only directory of all registered users
 const AdminUsers = () => {
   const { user } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
 
+  // Fetch the full user list on mount (or whenever the logged-in user changes)
   useEffect(() => {
     const fetchUsers = async () => {
       const res = await fetch('/api/auth/users', {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       const data = await res.json();
+      // Defensive check: ensure we always set an array, even if the API returns something unexpected
       setUsers(Array.isArray(data) ? data : []);
     };
     fetchUsers();
@@ -19,6 +22,7 @@ const AdminUsers = () => {
   return (
     <div style={containerStyle}>
       <h2 style={{ color: '#f97316', marginBottom: '20px' }}>User Directory</h2>
+      {/* Horizontally scrollable wrapper in case the table is wider than the viewport */}
       <div style={{ overflowX: 'auto' }}>
         <table style={tableStyle}>
           <thead>
@@ -33,10 +37,12 @@ const AdminUsers = () => {
           <tbody>
             {users.map(u => (
               <tr key={u._id} style={rowStyle}>
+                {/* Show a shortened user ID for readability */}
                 <td style={tdStyle}>{u._id.substring(0, 8)}...</td>
                 <td style={tdStyle}>{u.name}</td>
                 <td style={tdStyle}>{u.email}</td>
                 <td style={tdStyle}>
+                  {/* Role badge, color-coded: orange for admin, green for regular users */}
                   <span style={{ background: u.role === 'admin' ? 'rgba(234,88,12,0.2)' : 'rgba(16,185,129,0.2)', color: u.role === 'admin' ? '#f97316' : '#10b981', padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: 'bold' }}>
                     {u.role.toUpperCase()}
                   </span>
@@ -51,6 +57,7 @@ const AdminUsers = () => {
   );
 };
 
+// Shared inline styles for the page container and table elements
 const containerStyle = { maxWidth: '1200px', margin: '40px auto', padding: '30px', background: '#18181b', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', color: '#fafafa' };
 const tableStyle = { width: '100%', borderCollapse: 'collapse' };
 const rowStyle = { borderBottom: '1px solid rgba(255,255,255,0.1)' };
