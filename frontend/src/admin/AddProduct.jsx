@@ -2,16 +2,23 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+// Admin-only page for creating a new product, including an image upload to Cloudinary
 const AddProduct = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   
+  // Text/number fields for the new product
   const [formData, setFormData] = useState({
     name: '', description: '', price: '', category: '', stock: ''
   });
+  // Selected image file (sent as multipart/form-data)
   const [image, setImage] = useState(null);
+  // Tracks in-flight submit request (disables button, shows upload progress text)
   const [loading, setLoading] = useState(false);
 
+  // Route guard: redirect non-admins away from this page.
+  // Note: this runs on every render (not inside useEffect), so navigate() is called
+  // directly during render for unauthorized users, and the component renders nothing (null)
   if (!user || user.role !== 'admin') {
     navigate('/');
     return null;
@@ -19,9 +26,11 @@ const AddProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Require an image before allowing submission
     if (!image) return alert('Please select an image');
     
     setLoading(true);
+    // Build multipart form data since an image file needs to be uploaded alongside text fields
     const data = new FormData();
     data.append('name', formData.name);
     data.append('description', formData.description);
@@ -31,6 +40,8 @@ const AddProduct = () => {
     data.append('image', image);
 
     try {
+      // Direct fetch call (not using a shared axios instance like other pages);
+      // manually attaches the admin's auth token
       const res = await fetch('/api/products', {
         method: 'POST',
         headers: { Authorization: `Bearer ${user.token}` },
@@ -52,9 +63,12 @@ const AddProduct = () => {
   };
 
   return (
+    // Inline-styled dark card container (styles defined below via JS objects, not Tailwind/CSS classes)
     <div style={{ maxWidth: '600px', margin: '40px auto', background: '#18181b', padding: '40px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
       <h2 style={{ color: '#f97316', marginBottom: '20px' }}>Add New Product</h2>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        {/* Each input updates the corresponding formData field via inline onChange handlers
+            (uncontrolled in the sense that `value` isn't set, so these behave as uncontrolled inputs) */}
         <input 
           type="text" placeholder="Product Name" required 
           onChange={(e) => setFormData({...formData, name: e.target.value})} 
@@ -81,6 +95,8 @@ const AddProduct = () => {
           style={inputStyle} 
         />
         
+        {/* File input for the product image, stored separately from formData since
+            it needs to be appended to FormData as a file, not a plain string field */}
         <div style={{ padding: '15px', border: '1px dashed #f97316', borderRadius: '8px' }}>
           <label style={{ display: 'block', marginBottom: '10px', color: '#a1a1aa' }}>Upload Product Image (Cloudinary)</label>
           <input 
@@ -98,6 +114,7 @@ const AddProduct = () => {
   );
 };
 
+// Shared inline style object reused across all text/number/textarea inputs above
 const inputStyle = {
   padding: '12px',
   background: '#09090b',
