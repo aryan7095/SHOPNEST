@@ -4,20 +4,27 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { clearCart } from '../redux/cartSlice';
 
+// Checkout page: collects shipping address, initiates Razorpay payment,
+// and saves the order once payment is verified
 const Checkout = () => {
   const { user } = useContext(AuthContext);
+  // Cart items from Redux store
   const cartItems = useSelector((state) => state.cart.cartItems);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Shipping address form fields
   const [address, setAddress] = useState({
     fullName: '', street: '', city: '', postalCode: '', country: ''
   });
 
+  // Computed total price across all cart items
   const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
 
+  // Initiates the Razorpay payment flow
   const handlePayment = async () => {
     try {
+      // Step 1: ask the backend to create a Razorpay order for the total amount
       const orderRes = await fetch('/api/payment/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -27,6 +34,8 @@ const Checkout = () => {
 
       if (!orderRes.ok) {
         // Razorpay unconfigured exception handler
+        // If the backend couldn't create a Razorpay order (e.g. missing API keys),
+        // offer a fallback "bypass" flow to still place a test order
         const fallback = window.confirm("Razorpay keys unconfigured on backend. Use Student Bypass Mode to place test order?");
         if (fallback) {
           return bypassPayment();
@@ -35,6 +44,7 @@ const Checkout = () => {
         }
       }
 
+      // Step 2: configure and open the Razorpay checkout widget
       const options = {
         key: 'rzp_test_dummykey123', // Student dummy fallback
         amount: orderData.amount,
@@ -42,13 +52,16 @@ const Checkout = () => {
         name: 'ShopNest',
         description: 'Test Transaction',
         order_id: orderData.id,
+        // Called by Razorpay once the user completes payment in the widget
         handler: async function (response) {
+          // Step 3: verify the payment signature server-side
           const verifyRes = await fetch('/api/payment/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(response)
           });
           if (verifyRes.ok) {
+            // Step 4: payment verified — persist the order with cart items, address, and payment ID
             const saveOrderRes = await fetch('/api/orders', {
               method: 'POST',
               headers: { 
@@ -64,6 +77,7 @@ const Checkout = () => {
             });
 
             if (saveOrderRes.ok) {
+              // Order saved successfully — clear the cart and redirect to a success page
               dispatch(clearCart());
               navigate('/ordersuccess');
             } else {
@@ -73,6 +87,7 @@ const Checkout = () => {
             alert('Payment verification failed');
           }
         },
+        // Pre-fills checkout widget fields with known user/address info
         prefill: {
           name: address.fullName,
           email: user?.email,
@@ -83,6 +98,7 @@ const Checkout = () => {
         }
       };
       
+      // Instantiate and open the Razorpay checkout modal (loaded globally via index.html script tag)
       const rzp1 = new window.Razorpay(options);
       rzp1.open();
     } catch (error) {
@@ -90,6 +106,8 @@ const Checkout = () => {
     }
   };
 
+  // Fallback path used when Razorpay isn't configured on the backend:
+  // creates the order directly with a fake/placeholder payment ID, skipping real payment
   const bypassPayment = async () => {
     const saveOrderRes = await fetch('/api/orders', {
       method: 'POST',
@@ -110,6 +128,7 @@ const Checkout = () => {
     }
   };
 
+  // Form submit handler: requires login before proceeding to payment
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!user) {
@@ -126,6 +145,7 @@ const Checkout = () => {
       <div className="checkout-content">
         <form onSubmit={handleSubmit} className="shipping-form">
           <h3>Shipping Address</h3>
+          {/* Controlled inputs for each address field */}
           <input type="text" placeholder="Full Name" required value={address.fullName} onChange={(e) => setAddress({...address, fullName: e.target.value})} />
           <input type="text" placeholder="Street" required value={address.street} onChange={(e) => setAddress({...address, street: e.target.value})} />
           <input type="text" placeholder="City" required value={address.city} onChange={(e) => setAddress({...address, city: e.target.value})} />
