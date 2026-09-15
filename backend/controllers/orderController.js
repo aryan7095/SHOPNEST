@@ -1,9 +1,11 @@
 const Order = require('../models/Order');
 const sendEmail = require('../utils/sendEmail');
 
+// POST /orders - creates a new order for the logged-in user and emails a confirmation
 const addOrderItems = async (req, res) => {
   try {
     const { items, totalAmount, address, paymentId } = req.body;
+    // Reject empty orders
     if (items && items.length === 0) {
       return res.status(400).json({ message: 'No order items' });
     } else {
@@ -39,6 +41,7 @@ const addOrderItems = async (req, res) => {
   }
 };
 
+// GET /orders/my - returns orders belonging to the currently logged-in user
 const getMyOrders = async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.user._id });
@@ -48,6 +51,7 @@ const getMyOrders = async (req, res) => {
   }
 };
 
+// GET /orders - returns ALL orders with basic user info populated (likely admin-only route)
 const getOrders = async (req, res) => {
   try {
     const orders = await Order.find({}).populate('userId', 'id name');
@@ -57,10 +61,12 @@ const getOrders = async (req, res) => {
   }
 };
 
+// PUT /orders/:id/status - updates an order's status (e.g. shipped, delivered) — admin action
 const updateOrderStatus = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
     if (order) {
+      // Only overwrite status if a new one is provided; otherwise keep existing value
       order.status = req.body.status || order.status;
       const updatedOrder = await order.save();
       res.json(updatedOrder);
