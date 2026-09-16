@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+// Simple static page shown after a successful checkout/payment
 const OrderSuccess = () => {
+  // Card container style for the confirmation message
   const containerStyle = {
     maxWidth: '600px',
     margin: '50px auto',
@@ -19,6 +21,7 @@ const OrderSuccess = () => {
       <p style={{ color: '#a1a1aa', fontSize: '1.2rem', marginBottom: '40px' }}>
         Thank you for your order. We have securely received your payment and will process your shipment shortly.
       </p>
+      {/* Link back to continue shopping */}
       <Link to="/shop" className="btn">Continue Shopping</Link>
     </div>
   );
