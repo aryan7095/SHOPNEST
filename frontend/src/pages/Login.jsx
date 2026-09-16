@@ -3,9 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/auth.css';
 
+// Login page: authenticates via the API directly, then stores the result via AuthContext
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  // AuthContext's `login` here just stores already-fetched user data (see AuthContext.jsx),
+  // so this component performs the actual API call itself
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -19,9 +22,11 @@ const Login = () => {
       });
       const data = await res.json();
       if (res.ok) {
+        // Successful login: store user data (including token) in context/localStorage
         login(data);
         navigate('/');
       } else {
+        // Show the backend's error message (e.g. "Invalid email or password")
         alert(data.message);
       }
     } catch (error) {
