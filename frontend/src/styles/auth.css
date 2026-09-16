@@ -1,3 +1,4 @@
+/* Full-height centered wrapper so the auth form sits in the middle of the viewport */
 .auth-container {
   display: flex;
   justify-content: center;
@@ -5,6 +6,7 @@
   min-height: 70vh;
 }
 
+/* Card container for the login/register form */
 .auth-form {
   background: #18181b;
   padding: 40px;
@@ -16,26 +18,29 @@
   flex-direction: column;
   gap: 20px;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  position: relative;
-  overflow: hidden;
+  position: relative; /* needed so the ::before shimmer bar positions relative to this card */
+  overflow: hidden; /* clips the shimmer bar so it doesn't overflow the rounded corners */
 }
 
+/* Decorative animated shimmer bar along the top edge of the form */
 .auth-form::before {
   content: '';
   position: absolute;
   top: 0;
   left: -50%;
-  width: 200%;
+  width: 200%; /* oversized so it can slide across without revealing empty edges */
   height: 4px;
   background: linear-gradient(90deg, transparent, #f97316, transparent);
   animation: shimmer 3s infinite linear;
 }
 
+/* Slides the shimmer bar horizontally back and forth, looping infinitely */
 @keyframes shimmer {
   0% { transform: translateX(-50%); }
   100% { transform: translateX(50%); }
 }
 
+/* Form heading (e.g. "Login" / "Register") */
 .auth-form h2 {
   text-align: center;
   font-size: 2rem;
@@ -43,6 +48,7 @@
   margin-bottom: 10px;
 }
 
+/* Base styling for all text/email/password inputs in the form */
 .auth-form input {
   padding: 15px;
   background: #09090b;
@@ -54,17 +60,20 @@
   transition: all 0.3s ease;
 }
 
+/* Highlight the active input with an orange border and soft glow */
 .auth-form input:focus {
   border-color: #f97316;
   box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
 }
 
+/* "Don't have an account? / Already have an account?" helper text below the form */
 .auth-form p {
   text-align: center;
   margin-top: 15px;
   color: #a1a1aa;
 }
 
+/* Styling for the login/register switch link */
 .auth-form a {
   color: #f97316;
   font-weight: 600;
