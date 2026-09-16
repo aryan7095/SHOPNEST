@@ -1,5 +1,8 @@
+/* Imports the "Outfit" Google Font at several weights */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
+/* Global reset: removes default spacing, uses border-box sizing everywhere,
+   and applies the Outfit font site-wide */
 * {
   margin: 0;
   padding: 0;
@@ -7,13 +10,16 @@
   font-family: 'Outfit', sans-serif;
 }
 
+/* Base page background/text color (dark theme) */
 body {
   background-color: #09090b;
   color: #fafafa;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: hidden; /* prevents horizontal scrollbars from any overflowing elements */
 }
 
+/* Main content wrapper (likely sits below the navbar), constrained width,
+   with a fade-in animation on load */
 .main-content {
   min-height: 85vh;
   padding: 40px 20px;
@@ -22,17 +28,21 @@ body {
   animation: fadeIn 0.6s ease-in-out;
 }
 
+/* Remove default link styling; inherit text color from parent so links
+   don't default to blue */
 a {
   text-decoration: none;
   color: inherit;
   transition: all 0.3s ease;
 }
 
+/* Remove default list bullets */
 ul {
   list-style: none;
 }
 
 /* Premium Buttons */
+/* Shared styling for the site's primary call-to-action buttons (".btn" className used throughout) */
 .btn {
   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   color: #fff;
@@ -48,23 +58,27 @@ ul {
   text-align: center;
 }
 
+/* Lift + brighten effect on hover */
 .btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(234, 88, 12, 0.5);
   filter: brightness(1.1);
 }
 
+/* Slight press-down effect when clicked */
 .btn:active {
   transform: translateY(1px);
 }
 
 /* Base Headings */
+/* Shared heading styles across the site */
 h1, h2, h3, h4 {
   font-weight: 700;
   letter-spacing: -0.5px;
   margin-bottom: 20px;
 }
 
+/* h2 specifically gets a subtle white-to-gray gradient text effect */
 h2 {
   font-size: 2.2rem;
   background: linear-gradient(to right, #ffffff, #a1a1aa);
@@ -73,12 +87,14 @@ h2 {
 }
 
 /* Smooth Fade In */
+/* Used by .main-content: fades and slides content in slightly from below on load */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 /* Custom Scrollbar */
+/* Styles the scrollbar itself (WebKit browsers only, e.g. Chrome/Edge/Safari) to match the dark theme */
 ::-webkit-scrollbar {
   width: 8px;
 }
