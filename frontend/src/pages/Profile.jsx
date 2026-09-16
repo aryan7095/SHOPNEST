@@ -2,12 +2,15 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
+// User profile page: shows account info and their order history
 const Profile = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
+  // Tracks in-flight orders fetch for loading UI
   const [loading, setLoading] = useState(true);
 
+  // Guard route: redirect to login if not authenticated, otherwise fetch the user's orders
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -20,9 +23,11 @@ const Profile = () => {
         });
         const data = await res.json();
         if (res.ok) {
+          // Defensive check: ensure we always set an array, even if the API returns something unexpected
           setOrders(Array.isArray(data) ? data : []);
         } else {
           // Token obsolete or 401: clear and bounce
+          // If the token is no longer valid, log the user out and send them to login
           if (res.status === 401) {
              logout();
              navigate('/login');
@@ -38,18 +43,22 @@ const Profile = () => {
     fetchMyOrders();
   }, [user, navigate]);
 
+  // Manual logout button handler
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  // Shared inline styles for the page container and the account-type badge
   const containerStyle = { maxWidth: '1000px', margin: '40px auto', padding: '30px', background: '#18181b', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', color: '#fafafa' };
   const badgeStyle = { background: 'rgba(249,115,22,0.1)', color: '#f97316', padding: '6px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 'bold', display: 'inline-block' };
 
+  // Avoid rendering anything while the redirect-to-login effect is about to fire
   if (!user) return null;
 
   return (
     <div style={containerStyle}>
+      {/* Header: user info on the left, logout button on the right */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '30px', marginBottom: '30px' }}>
         <div>
           <h2 style={{ color: '#fff', fontSize: '2.2rem', marginBottom: '10px' }}>My Profile</h2>
@@ -61,6 +70,7 @@ const Profile = () => {
       </div>
 
       <h3 style={{ color: '#f97316', marginBottom: '20px', fontSize: '1.5rem' }}>Order History</h3>
+      {/* Loading state, empty state, or list of past orders */}
       {loading ? (
         <p style={{ color: '#a1a1aa' }}>Fetching your orders...</p>
       ) : orders.length === 0 ? (
@@ -78,6 +88,7 @@ const Profile = () => {
                 <p style={{ color: '#a1a1aa', fontSize: '0.9rem' }}>Total: <strong style={{ color: '#10b981' }}>₹{order.totalAmount.toFixed(2)}</strong></p>
               </div>
               <div>
+                {/* Status badge, color-coded by order fulfillment stage */}
                 <span style={{ 
                   background: order.status === 'Delivered' ? 'rgba(16,185,129,0.1)' : order.status === 'Shipped' ? 'rgba(59,130,246,0.1)' : 'rgba(245,158,11,0.1)', 
                   color: order.status === 'Delivered' ? '#10b981' : order.status === 'Shipped' ? '#3b82f6' : '#f59e0b',
