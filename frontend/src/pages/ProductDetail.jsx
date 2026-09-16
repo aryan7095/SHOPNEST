@@ -4,12 +4,15 @@ import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
 import '../styles/product.css';
 
+// Product detail page: shows full product info and lets the user add it to the cart
 const ProductDetail = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // product ID from the URL
   const [product, setProduct] = useState(null);
+  // Tracks initial fetch state for loading UI
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
+  // Fetch the product's details on mount / whenever the id param changes
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -25,6 +28,8 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
+  // Dispatches an "add to cart" action with a fixed quantity of 1,
+  // pulling only the fields the cart needs from the full product object
   const handleAddToCart = () => {
     if (product) {
       dispatch(addToCart({
@@ -38,6 +43,7 @@ const ProductDetail = () => {
     }
   };
 
+  // Loading and not-found states before rendering the actual product
   if (loading) return <div style={{ textAlign: 'center', margin: '100px', color: '#f97316' }}>Loading Product...</div>;
   if (!product) return <div style={{ textAlign: 'center', margin: '100px', color: '#ef4444' }}>Product Not Found</div>;
 
@@ -75,6 +81,7 @@ const ProductDetail = () => {
             </button>
           </div>
           
+          {/* Stock status indicator, color-coded green/red */}
           <p style={{ marginTop: '20px', color: product.stock > 0 ? '#10b981' : '#ef4444', fontWeight: '600' }}>
             {product.stock > 0 ? `● In Stock (${product.stock} units available)` : `● Temporarily Out of Stock`}
           </p>
