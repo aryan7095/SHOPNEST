@@ -1,4 +1,5 @@
 /* Hero Banner */
+/* Large intro banner on the Home page: layered radial + linear gradient background */
 .hero-banner {
   background: radial-gradient(circle at top right, rgba(249, 115, 22, 0.2), transparent 60%), linear-gradient(135deg, #18181b 0%, #09090b 100%);
   color: white;
@@ -24,6 +25,7 @@
 }
 
 /* Grid & Cards */
+/* Responsive product grid: as many columns as fit, each at least 280px wide */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -31,18 +33,20 @@
   margin-top: 30px;
 }
 
+/* Individual product card container */
 .product-card {
   background: #18181b;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* bouncy easing curve */
   border: 1px solid rgba(255,255,255,0.03);
   display: flex;
   flex-direction: column;
   position: relative;
 }
 
+/* Lift effect + glowing orange outline ring on hover */
 .product-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(249, 115, 22, 0.3);
@@ -55,10 +59,12 @@
   transition: transform 0.5s ease;
 }
 
+/* Slight zoom-in on the product image when its card is hovered */
 .product-card:hover .product-image {
   transform: scale(1.05);
 }
 
+/* Text/info section below the image */
 .product-info {
   padding: 20px;
   text-align: left;
@@ -66,11 +72,12 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: linear-gradient(to top, #18181b 80%, transparent);
+  background: linear-gradient(to top, #18181b 80%, transparent); /* subtle gradient blending into the image above */
   position: relative;
   z-index: 2;
 }
 
+/* Product name, truncated with an ellipsis if it's too long for one line */
 .product-info h3 {
   font-size: 1.1rem;
   margin-bottom: 10px;
@@ -80,6 +87,7 @@
   text-overflow: ellipsis;
 }
 
+/* Price, styled in the brand orange to stand out */
 .price {
   font-size: 22px;
   font-weight: 700;
@@ -88,6 +96,7 @@
 }
 
 /* Search Bar */
+/* Product search input used on the Shop page */
 .search-bar {
   width: 100%;
   max-width: 500px;
@@ -102,12 +111,14 @@
   outline: none;
 }
 
+/* Highlight the search bar with the brand orange border + glow when focused */
 .search-bar:focus {
   border-color: #f97316;
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 }
 
 /* Detail Page */
+/* Two-column layout for the product detail page: image on one side, info on the other */
 .product-detail {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -125,6 +136,7 @@
   object-fit: cover;
 }
 
+/* Vertically centers the info block within its grid column */
 .detail-info {
   display: flex;
   flex-direction: column;
@@ -150,6 +162,7 @@
   margin-bottom: 30px;
 }
 
+/* On smaller screens, stack the detail page's image and info into a single column */
 @media (max-width: 900px) {
   .product-detail {
     grid-template-columns: 1fr;
