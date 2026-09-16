@@ -1,18 +1,20 @@
+/* Sticky top navbar with a translucent, blurred "glass" background */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 18px 50px;
   background: rgba(9, 9, 11, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px); /* frosted-glass blur of content scrolling behind the navbar */
+  -webkit-backdrop-filter: blur(12px); /* Safari support */
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 1000; /* keeps navbar above page content while scrolling */
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 }
 
+/* Brand/logo text styling */
 .navbar-brand a {
   font-size: 28px;
   font-weight: 700;
@@ -24,29 +26,34 @@
   text-shadow: 0 2px 10px rgba(249, 115, 22, 0.3);
 }
 
+/* Decorative orange "." appended after the brand name (e.g. "ShopNest.") */
 .navbar-brand a::after {
   content: '.';
   color: #f97316;
   font-size: 36px;
 }
 
+/* Row of navigation links */
 .navbar-links {
   display: flex;
   align-items: center;
   gap: 30px;
 }
 
+/* Base styling for nav links and any plain text items (e.g. "Hi, {name}" span) */
 .navbar-links a, .navbar-links span {
   font-size: 15px;
   font-weight: 500;
   color: #a1a1aa;
-  position: relative;
+  position: relative; /* needed so the ::after underline positions relative to each link */
 }
 
+/* Brighten link text on hover */
 .navbar-links a:hover {
   color: #fff;
 }
 
+/* Underline element, starts at 0 width (invisible) */
 .navbar-links a::after {
   content: '';
   position: absolute;
@@ -59,10 +66,12 @@
   border-radius: 2px;
 }
 
+/* Animate the underline expanding to full width on hover */
 .navbar-links a:hover::after {
   width: 100%;
 }
 
+/* Logout button, styled as an outlined red "ghost" button to stand out from nav links */
 .btn-logout {
   background: transparent;
   color: #ef4444;
@@ -75,12 +84,15 @@
   transition: all 0.3s ease;
 }
 
+/* Subtle fill + lift effect on hover */
 .btn-logout:hover {
   background: rgba(239, 68, 68, 0.1);
   border-color: #ef4444;
   transform: translateY(-1px);
 }
 
+/* On smaller screens, stack the brand and links vertically instead of side-by-side,
+   with reduced horizontal padding */
 @media (max-width: 768px) {
   .navbar {
     padding: 15px 20px;
